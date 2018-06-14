@@ -11,7 +11,7 @@ import { takeWhile } from 'rxjs/operators';
     </nb-layout>
   `,
 })
-export class NbOAuth2CallbackPlaygroundComponent implements OnDestroy {
+export class NbOAuth2CallbackComponent implements OnDestroy {
 
   alive = true;
 

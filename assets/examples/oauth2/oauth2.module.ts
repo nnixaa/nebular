@@ -15,8 +15,8 @@ import {
   NbOAuth2ResponseType,
 } from '@nebular/auth';
 
-import { NbOAuth2PlaygroundComponent } from './oauth2.component';
-import { NbOAuth2CallbackPlaygroundComponent } from './oauth2-callback.component';
+import { NbOAuth2LoginComponent } from './oauth2-login.component';
+import { NbOAuth2CallbackComponent } from './oauth2-callback.component';
 
 
 @NgModule({
@@ -28,11 +28,11 @@ import { NbOAuth2CallbackPlaygroundComponent } from './oauth2-callback.component
     RouterModule.forChild([
       {
         path: '',
-        component: NbOAuth2PlaygroundComponent,
+        component: NbOAuth2LoginComponent,
       },
       {
         path: 'callback',
-        component: NbOAuth2CallbackPlaygroundComponent,
+        component: NbOAuth2CallbackComponent,
       },
     ]),
 
@@ -60,8 +60,8 @@ import { NbOAuth2CallbackPlaygroundComponent } from './oauth2-callback.component
     NbLayoutModule,
   ],
   declarations: [
-    NbOAuth2PlaygroundComponent,
-    NbOAuth2CallbackPlaygroundComponent,
+    NbOAuth2LoginComponent,
+    NbOAuth2CallbackComponent,
   ],
 })
 export class NbOAuth2PlaygroundModule {
