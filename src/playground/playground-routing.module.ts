@@ -152,6 +152,10 @@ import { NbScrollWindowComponent } from './scroll/scroll-window.component';
 import { NbModalShowcaseComponent } from './modal/modal-showcase.component';
 import { NbToasterShowcaseComponent } from './toaster/toaster-showcase.component';
 import { NbCollapsibleWindowShowcaseComponent } from './collapsible-window/collapsible-window-showcase.component';
+import { NbTooltipShowcaseComponent } from './tooltip/tooltip-showcase.component';
+import { NbTooltipWithIconComponent } from './tooltip/tooltip-with-icon.component';
+import { NbTooltipPlacementsComponent } from './tooltip/tooltip-placements.component';
+import { NbTooltipColorsComponent } from './tooltip/tooltip-colors.component';
 
 export const routes: Routes = [
   {
@@ -673,6 +677,27 @@ export const routes: Routes = [
           {
             path: 'input-full-width.component',
             component: NbInputFullWidthComponent,
+          },
+        ],
+      },
+      {
+        path: 'tooltip',
+        children: [
+          {
+            path: 'tooltip-showcase.component',
+            component: NbTooltipShowcaseComponent,
+          },
+          {
+            path: 'tooltip-with-icon.component',
+            component: NbTooltipWithIconComponent,
+          },
+          {
+            path: 'tooltip-placements.component',
+            component: NbTooltipPlacementsComponent,
+          },
+          {
+            path: 'tooltip-colors.component',
+            component: NbTooltipColorsComponent,
           },
         ],
       },

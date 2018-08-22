@@ -35,6 +35,7 @@ import {
   NbModalModule,
   NbToasterModule,
   NbCollapsibleWindowModule,
+  NbTooltipModule,
 } from '@nebular/theme';
 
 import { NbPlaygroundRoutingModule } from './playground-routing.module';
@@ -185,6 +186,10 @@ import { NbScrollWindowComponent } from './scroll/scroll-window.component';
 import { NbModalShowcaseComponent } from './modal/modal-showcase.component';
 import { NbCollapsibleWindowShowcaseComponent } from './collapsible-window/collapsible-window-showcase.component';
 import { NbToasterShowcaseComponent } from './toaster/toaster-showcase.component';
+import { NbTooltipShowcaseComponent } from './tooltip/tooltip-showcase.component';
+import { NbTooltipWithIconComponent } from './tooltip/tooltip-with-icon.component';
+import { NbTooltipPlacementsComponent } from './tooltip/tooltip-placements.component';
+import { NbTooltipColorsComponent } from './tooltip/tooltip-colors.component';
 
 export const NB_MODULES = [
   NbCardModule,
@@ -218,6 +223,7 @@ export const NB_MODULES = [
   NbModalModule,
   NbCollapsibleWindowModule,
   NbToasterModule,
+  NbTooltipModule,
 ];
 
 export const NB_EXAMPLE_COMPONENTS = [
@@ -361,6 +367,10 @@ export const NB_EXAMPLE_COMPONENTS = [
   NbModalShowcaseComponent,
   NbToasterShowcaseComponent,
   NbCollapsibleWindowShowcaseComponent,
+  NbTooltipShowcaseComponent,
+  NbTooltipWithIconComponent,
+  NbTooltipPlacementsComponent,
+  NbTooltipColorsComponent,
 ];
 
 @NgModule({

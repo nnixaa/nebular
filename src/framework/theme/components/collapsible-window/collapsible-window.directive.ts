@@ -8,7 +8,6 @@ import { NbThemeService } from '../../services/theme.service';
 /**
 * Collapsible windows.
 *
-* @stacked-example(Plain usage, collapsible/collapsible-showcase.component)
  *
  * Collipsable windows can be collapsed
  *

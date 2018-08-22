@@ -71,3 +71,6 @@ export * from './components/toaster/toaster.module';
 export * from './components/toaster/toaster.service';
 export * from './components/collapsible-window/collapsible-window.directive';
 export * from './components/collapsible-window/collapsible-window.module';
+export * from './components/tooltip/tooltip.module';
+export * from './components/tooltip/tooltip.component';
+export * from './components/tooltip/tooltip.directive';

@@ -12,7 +12,7 @@ const EXAMPLES_DEST = './docs/assets/examples';
 task('copy-examples', () => {
   del.sync(EXAMPLES_DEST);
   src(EXAMPLES_SRC)
-    .pipe(replace(/\/\*\*.*\*\/\n\s*\n/s, ''))
+    .pipe(replace(/\/\*\*.*\*\/\n\s*\n/, '')) // remove first comment block
     .pipe(dest(EXAMPLES_DEST));
 });
 

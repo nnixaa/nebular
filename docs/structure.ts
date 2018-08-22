@@ -310,6 +310,15 @@ export const structure = [
       },
       {
         type: 'tabs',
+        name: 'Tooltip',
+        icon: 'tooltip.svg',
+        source: [
+          'NbTooltipDirective',
+          'NbTooltipComponent',
+        ],
+      },
+      {
+        type: 'tabs',
         name: 'Context Menu',
         icon: 'context-menu.svg',
         source: [
@@ -356,7 +365,7 @@ export const structure = [
         type: 'tabs',
         name: 'Collapsable Windows',
         source: [
-          'NbCollapsableDirective',
+          // 'NbCollapsableDirective',
         ],
       },
       {

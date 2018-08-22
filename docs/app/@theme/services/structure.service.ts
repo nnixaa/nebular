@@ -87,8 +87,15 @@ export class NgdStructureService {
   }
 
   protected getComponents(item: any, preparedDocs) {
+    const findOrThrow = (docs, name) => {
+      const component = docs.find((data) => data.name === name);
+      if (!component) {
+        throw new Error(`Docs Structure Service: cannot find component '${name}'`);
+      }
+      return component;
+    };
     return item.source
-      .map(source => preparedDocs.classes.find((data) => data.name === source))
+      .map(source => findOrThrow(preparedDocs.classes, source))
       .map(component => this.prepareComponent(component));
   }
 
