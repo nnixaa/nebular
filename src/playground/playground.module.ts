@@ -35,6 +35,7 @@ import {
   NbModalModule,
   NbToasterModule,
   NbCollapsibleWindowModule,
+  NbOverlayModule,
   NbTooltipModule,
 } from '@nebular/theme';
 
@@ -183,7 +184,7 @@ import { NbInputShapesComponent } from './input/input-shapes.component';
 import { NbInputTypesComponent } from './input/input-types.component';
 import { NbInputFullWidthComponent } from './input/input-full-width.component';
 import { NbScrollWindowComponent } from './scroll/scroll-window.component';
-import { NbModalShowcaseComponent } from './modal/modal-showcase.component';
+import { NbModalComponent, NbModalShowcaseComponent } from './modal/modal-showcase.component';
 import { NbCollapsibleWindowShowcaseComponent } from './collapsible-window/collapsible-window-showcase.component';
 import { NbToasterShowcaseComponent } from './toaster/toaster-showcase.component';
 import { NbTooltipShowcaseComponent } from './tooltip/tooltip-showcase.component';
@@ -367,6 +368,7 @@ export const NB_EXAMPLE_COMPONENTS = [
   NbModalShowcaseComponent,
   NbToasterShowcaseComponent,
   NbCollapsibleWindowShowcaseComponent,
+  NbModalComponent,
   NbTooltipShowcaseComponent,
   NbTooltipWithIconComponent,
   NbTooltipPlacementsComponent,
@@ -379,6 +381,7 @@ export const NB_EXAMPLE_COMPONENTS = [
     NbPlaygroundRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+    NbOverlayModule.forRoot(),
     ...NB_MODULES,
   ],
   declarations: [
@@ -386,6 +389,7 @@ export const NB_EXAMPLE_COMPONENTS = [
     NbPlaygroundBaseComponent,
     ...NB_EXAMPLE_COMPONENTS,
   ],
+  entryComponents: [NbModalComponent],
 })
 export class NbPlaygroundModule {
 }

@@ -1,6 +1,3 @@
-import { ComponentRef } from '@angular/core';
-import { NbPortal, NbPortalContent } from '../portal/portal-outlet';
-
 export enum NbToastPosition {
   TOP_RIGHT = 'top-right',
   TOP_LEFT = 'top-left',
@@ -23,21 +20,17 @@ export enum NbToastStatus {
 
 export class NbToast {
   title: string;
-  content: NbPortalContent;
-  context?: Object;
-  position?: NbToastPosition;
-  duration?: number;
-  status?: NbToastStatus;
-  margin?: number;
+  message: string;
+  config: NbToastConfig;
 }
 
-export class NbToastPortal extends NbPortal {
-  position: string;
-  duration: number;
-  margin: number;
-}
+export class NbToastConfig {
+  position: NbToastPosition = NbToastPosition.TOP_END;
+  status: NbToastStatus = NbToastStatus.DEFAULT;
+  duration: number = 3000;
+  destroyByClick: boolean = true;
 
-export class NbToastRegistryBag {
-  ref: ComponentRef<any>;
-  portal: NbToastPortal;
+  constructor(config: Partial<NbToastConfig>) {
+    Object.assign(this, config);
+  }
 }

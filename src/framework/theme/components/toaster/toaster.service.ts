@@ -1,86 +1,121 @@
 import { ComponentRef, Injectable } from '@angular/core';
-import { NbPortalOutlet } from '../portal/portal-outlet';
-import { NbToastComponent } from './toaster.component';
-import { NbPositioningHelper } from './positioning.helper';
-import { NbToast, NbToastPortal, NbToastPosition, NbToastRegistryBag, NbToastStatus } from './model';
+
+import { NbComponentPortal, NbOverlayService, patch } from '../../cdk';
+import { NbToasterContainerComponent } from './toaster-container.component';
+import { NB_TOAST_TOP_POSITIONS, NbToastPositionFactory } from './toaster-position.service';
+import { NbToast, NbToastConfig, NbToastPosition, NbToastStatus } from './model';
 
 
-const DEFAULT_DURATION = 3000;
+export class NbToastContainer {
+  protected toasts: NbToast[] = [];
 
-/**
- * Toaster, the best with cosmic
- *
- * @stacked-example(Super toaster, toaster/toaster-showcase.component)
- * */
+  constructor(protected position: NbToastPosition, protected containerRef: ComponentRef<NbToasterContainerComponent>) {
+  }
+
+  attach(toast: NbToast) {
+    if (NB_TOAST_TOP_POSITIONS.includes(toast.config.position)) {
+      this.attachToTop(toast);
+    } else {
+      this.attachToBottom(toast);
+    }
+
+    if (toast.config.duration) {
+      this.setDestroyTimeout(toast);
+    }
+  }
+
+  protected attachToTop(toast: NbToast) {
+    this.toasts.unshift(toast);
+    this.updateContainer();
+
+    if (toast.config.destroyByClick) {
+      this.containerRef.instance.toasts.first.destroy.subscribe(() => this.destroy(toast));
+    }
+  }
+
+  protected attachToBottom(toast: NbToast) {
+    this.toasts.push(toast);
+    this.updateContainer();
+
+    if (toast.config.destroyByClick) {
+      this.containerRef.instance.toasts.last.destroy.subscribe(() => this.destroy(toast));
+    }
+  }
+
+  protected setDestroyTimeout(toast: NbToast) {
+    setTimeout(() => this.destroy(toast), toast.config.duration);
+  }
+
+  protected destroy(toast: NbToast) {
+    this.toasts = this.toasts.filter(t => t !== toast);
+    this.updateContainer();
+  }
+
+  protected updateContainer() {
+    patch(this.containerRef, { content: this.toasts, position: this.position });
+  }
+}
+
+@Injectable()
+export class NbToasterRegistry {
+  protected overlays: Map<NbToastPosition, NbToastContainer> = new Map();
+
+  constructor(protected overlay: NbOverlayService, protected positionFactory: NbToastPositionFactory) {
+  }
+
+  get(position: NbToastPosition): NbToastContainer {
+    if (!this.overlays.has(position)) {
+      this.instantiateController(position);
+    }
+
+    return this.overlays.get(position);
+  }
+
+  protected instantiateController(position: NbToastPosition) {
+    const container = this.createContainer(position);
+    this.overlays.set(position, container);
+  }
+
+  protected createContainer(position: NbToastPosition): NbToastContainer {
+    const positionStrategy = this.positionFactory.create(position);
+    const ref = this.overlay.create({ positionStrategy });
+    const containerRef = ref.attach(new NbComponentPortal(NbToasterContainerComponent));
+    return new NbToastContainer(position, containerRef);
+  }
+}
+
 @Injectable()
 export class NbToasterService {
-
-  private registry: NbToastRegistryBag[] = [];
-
-  constructor(private portalOutlet: NbPortalOutlet,
-              private positioningHelper: NbPositioningHelper) {
+  constructor(protected toasterRegistry: NbToasterRegistry) {
   }
 
-  show(toast: NbToast) {
-    const portal = this.buildPortal(toast);
-    this.create(portal);
+  show(message, title?, config?: Partial<NbToastConfig>) {
+    const container = this.toasterRegistry.get(config.position);
+    const toast = { message, title, config: new NbToastConfig(config) };
+    container.attach(toast);
   }
 
-  private create(portal: NbToastPortal) {
-    this.portalOutlet.create(portal)
-      .subscribe((ref: ComponentRef<any>) => {
-        this.save(ref, portal);
-        this.place(ref);
-        this.setupDestroyTimer(ref, portal);
-      });
+  success(message, title?, config?: Partial<NbToastConfig>) {
+    return this.show(message, title, { ...config, status: NbToastStatus.SUCCESS });
   }
 
-  private buildPortal({ content, context, duration, position, status, margin, title }: NbToast): NbToastPortal {
-    return {
-      content: NbToastComponent,
-      position: position || NbToastPosition.TOP_RIGHT,
-      duration: duration || DEFAULT_DURATION,
-      margin: margin || 16,
-      context: {
-        status: status || NbToastStatus.DEFAULT,
-        title,
-        content,
-        context,
-        onClick: instance => this.onClick(instance),
-      },
-    };
+  info(message, title?, config?: Partial<NbToastConfig>) {
+    return this.show(message, title, { ...config, status: NbToastStatus.INFO });
   }
 
-  private destroy(ref: ComponentRef<any>) {
-    ref.destroy();
-    const deleted = this.getBagIndex(ref);
-    this.registry.splice(deleted, 1);
-    this.recalculateRest(deleted);
+  warning(message, title?, config?: Partial<NbToastConfig>) {
+    return this.show(message, title, { ...config, status: NbToastStatus.WARNING });
   }
 
-  private onClick(instance) {
-    const ref = this.registry.find(bag => bag.ref.instance === instance).ref;
-    this.destroy(ref);
+  primary(message, title?, config?: Partial<NbToastConfig>) {
+    return this.show(message, title, { ...config, status: NbToastStatus.PRIMARY });
   }
 
-  private place(ref: ComponentRef<any>) {
-    const position = this.positioningHelper.calcPosition(ref, this.registry);
-    Object.assign(ref.instance, position);
+  danger(message, title?, config?: Partial<NbToastConfig>) {
+    return this.show(message, title, { ...config, status: NbToastStatus.DANGER });
   }
 
-  private setupDestroyTimer(ref: ComponentRef<any>, { duration }: NbToastPortal) {
-    setTimeout(() => this.destroy(ref), duration);
-  }
-
-  private save(ref: ComponentRef<any>, portal: NbToastPortal) {
-    this.registry.push({ ref, portal });
-  }
-
-  private recalculateRest(from: number) {
-    this.registry.slice(from).forEach(({ ref }) => this.place(ref));
-  }
-
-  private getBagIndex(ref: ComponentRef<any>): number {
-    return this.registry.findIndex(item => item.ref === ref);
+  default(message, title?, config?: Partial<NbToastConfig>) {
+    return this.show(message, title, { ...config, status: NbToastStatus.DEFAULT });
   }
 }

@@ -7,18 +7,12 @@
 import { ChangeDetectorRef, Component, HostBinding, Input, TemplateRef, Type, ViewChild } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
 
-import { NbContainer, NbPosition } from '../overlay';
+import { NbPosition } from '../overlay-position';
+import { NbContainer } from '../overlay-renderer';
 
 
 /**
- * Popover can be one of the following types:
- * template, component or plain js string.
- * So NbPopoverContent provides types alias for this purposes.
- * */
-export type NbPopoverContent = string | TemplateRef<any> | Type<any>;
-
-/**
- * Popover container.
+ * Overlay container.
  * Renders provided content inside.
  *
  * @styles
@@ -29,8 +23,8 @@ export type NbPopoverContent = string | TemplateRef<any> | Type<any>;
  * popover-shadow
  * */
 @Component({
-  selector: 'nb-popover',
-  styleUrls: ['./popover.component.scss'],
+  selector: 'nb-arrowed-overlay-container',
+  styleUrls: ['./arrowed-overlay-container.component.scss'],
   template: `
     <span class="arrow"></span>
 
@@ -43,19 +37,19 @@ export type NbPopoverContent = string | TemplateRef<any> | Type<any>;
     </ng-container>
   `,
 })
-export class NbPopoverComponent implements NbContainer {
+export class NbArrowedOverlayContainerComponent implements NbContainer {
   @Input()
   content: any;
 
+  @Input()
+  context: Object;
+
   /**
-   * Popover position relatively host element.
+   * Container position relatively host element.
    * */
   @Input()
   @HostBinding('class')
   position: NbPosition = NbPosition.TOP;
-
-  @Input()
-  context: Object;
 
   constructor(private cd: ChangeDetectorRef) {
   }

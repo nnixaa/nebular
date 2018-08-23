@@ -9,9 +9,14 @@ import { NbSharedModule } from '../shared/shared.module';
 import { NbPortalComponent } from './portal.component';
 import { NbPortalOutlet } from './portal-outlet';
 
+const PORTAL_COMPONENTS = [
+  NbPortalComponent,
+];
+
 @NgModule({
   imports: [NbSharedModule],
-  declarations: [NbPortalComponent],
+  declarations: [...PORTAL_COMPONENTS],
+  exports: [...PORTAL_COMPONENTS],
   entryComponents: [NbPortalComponent],
   providers: [NbPortalOutlet],
 })

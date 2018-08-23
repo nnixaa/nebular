@@ -1,6 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { NbToasterService } from '@nebular/theme';
-import { NbThemeService } from '../../framework/theme/services/theme.service';
 
 @Component({
   selector: 'nb-toaster-showcase',
@@ -16,7 +15,7 @@ import { NbThemeService } from '../../framework/theme/services/theme.service';
     <button class="btn btn-primary" (click)="showToast('top-right', 'danger')">Danger</button>
   `,
   styles: [
-    `
+      `
       /deep/ nb-layout-column {
         height: 80vw;
       }
@@ -24,28 +23,17 @@ import { NbThemeService } from '../../framework/theme/services/theme.service';
   ],
 })
 
-export class NbToasterShowcaseComponent implements OnInit, OnDestroy {
-
-  private index: number = 1;
-
-  constructor(private toasterService: NbToasterService,
-              private themeService: NbThemeService) {
+export class NbToasterShowcaseComponent {
+  constructor(private toasterService: NbToasterService) {
   }
 
-  ngOnInit() {
-    this.themeService.changeTheme('cosmic');
-  }
+  private index: number = 0;
 
-  ngOnDestroy() {
-    this.themeService.changeTheme('default');
-  }
-
-  showToast(placement, status) {
-    this.toasterService.show({
-      title: status || 'Success',
-      content: `My super toast ${this.index++}`,
-      position: placement,
-      status,
-    });
+  showToast(position, status) {
+    this.index += 1;
+    this.toasterService.show(
+      status || 'Success',
+      `Toast ${this.index}`,
+      { position, status });
   }
 }

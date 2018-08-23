@@ -1,20 +1,20 @@
 import { ElementRef, Inject, Injectable } from '@angular/core';
-import {
-  ConnectedOverlayPositionChange,
-  ConnectedPosition,
-  ConnectionPositionPair,
-  FlexibleConnectedPositionStrategy,
-  GlobalPositionStrategy,
-  OverlayPositionBuilder,
-  PositionStrategy,
-  ViewportRuler,
-} from '@angular/cdk/overlay';
-import { Platform } from '@angular/cdk/platform';
 
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import { NB_DOCUMENT } from '../../theme.options';
+import {
+  NbConnectedOverlayPositionChange,
+  NbConnectedPosition,
+  NbConnectionPositionPair,
+  NbFlexibleConnectedPositionStrategy,
+  NbGlobalPositionStrategy,
+  NbOverlayPositionBuilder,
+  NbPlatform,
+  NbPositionStrategy,
+} from '../mapping';
+import { NbViewportRulerAdapter } from '../adapter/index';
 
 
 export enum NbAdjustment {
@@ -32,12 +32,7 @@ export enum NbPosition {
   END = 'end',
 }
 
-export type NbPositionStrategy = PositionStrategy & {
-  positionChange: Observable<NbPosition>;
-};
-
-
-const right: ConnectedPosition = {
+const right: NbConnectedPosition = {
   originX: 'end',
   originY: 'center',
   overlayX: 'start',
@@ -45,7 +40,7 @@ const right: ConnectedPosition = {
   offsetX: 15,
 };
 
-const bottom: ConnectedPosition = {
+const bottom: NbConnectedPosition = {
   originX: 'center',
   originY: 'bottom',
   overlayX: 'center',
@@ -53,7 +48,7 @@ const bottom: ConnectedPosition = {
   offsetY: 15,
 };
 
-const left: ConnectedPosition = {
+const left: NbConnectedPosition = {
   originX: 'start',
   originY: 'center',
   overlayX: 'end',
@@ -61,7 +56,7 @@ const left: ConnectedPosition = {
   offsetX: -15,
 };
 
-const top: ConnectedPosition = {
+const top: NbConnectedPosition = {
   originX: 'center',
   originY: 'top',
   overlayX: 'center',
@@ -81,10 +76,12 @@ const NOOP_POSITIONS = [NbPosition.TOP, NbPosition.BOTTOM, NbPosition.LEFT, NbPo
 const CLOCKWISE_POSITIONS = [NbPosition.TOP, NbPosition.RIGHT, NbPosition.BOTTOM, NbPosition.LEFT];
 
 
-class NbAdjustableConnectedPositionStrategy extends FlexibleConnectedPositionStrategy implements NbPositionStrategy {
+export class NbAdjustableConnectedPositionStrategy
+  extends NbFlexibleConnectedPositionStrategy implements NbPositionStrategy {
+
   readonly positionChange: Observable<NbPosition> = this.positionChanges.pipe(
-    map((positionChange: ConnectedOverlayPositionChange) => positionChange.connectionPair),
-    map((connectionPair: ConnectionPositionPair) => {
+    map((positionChange: NbConnectedOverlayPositionChange) => positionChange.connectionPair),
+    map((connectionPair: NbConnectionPositionPair) => {
       return Object.entries(POSITIONS)
         .filter(([name, position]) => position === connectionPair)
         .map(([name]) => name as NbPosition)[0];
@@ -98,6 +95,7 @@ class NbAdjustableConnectedPositionStrategy extends FlexibleConnectedPositionStr
     return this;
   }
 
+  // TODO have to be applied after position
   adjustment(adjustment: NbAdjustment): this {
     let positions: NbPosition[];
     switch (adjustment) {
@@ -130,16 +128,18 @@ class NbAdjustableConnectedPositionStrategy extends FlexibleConnectedPositionStr
 @Injectable()
 export class NbPositionBuilderService {
   constructor(@Inject(NB_DOCUMENT) protected document,
-              protected viewportRuler: ViewportRuler,
-              protected platform: Platform,
-              protected positionBuilder: OverlayPositionBuilder) {
+              protected viewportRuler: NbViewportRulerAdapter,
+              protected platform: NbPlatform,
+              protected positionBuilder: NbOverlayPositionBuilder) {
   }
 
-  global(): GlobalPositionStrategy {
+  global(): NbGlobalPositionStrategy {
     return this.positionBuilder.global();
   }
 
   connectedTo(elementRef: ElementRef): NbAdjustableConnectedPositionStrategy {
     return new NbAdjustableConnectedPositionStrategy(elementRef, this.viewportRuler, this.document, this.platform)
+      .withFlexibleDimensions(false)
+      .withPush(false);
   }
 }

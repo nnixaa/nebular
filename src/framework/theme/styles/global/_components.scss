@@ -18,7 +18,6 @@
 @import '../../components/checkbox/checkbox.component.theme';
 @import '../../components/progress-bar/progress-bar.component.theme';
 @import '../../components/badge/badge.component.theme';
-@import '../../components/popover/popover.component.theme';
 @import '../../components/context-menu/context-menu.component.theme';
 @import '../../components/alert/alert.component.theme';
 @import '../../components/chat/chat.component.theme';
@@ -28,7 +27,9 @@
 @import '../../components/button/button.component.theme';
 @import '../../components/list/list.component.theme';
 @import '../../components/input/input.directive.theme';
-@import '../../components/toaster/toaster.component.theme';
+@import '../../components/toaster/toast.component.theme';
+@import '../../cdk/overlay/arrowed-overlay-container/arrowed-overlay-container.component.theme';
+@import '../../cdk/overlay/overlay.theme';
 @import '../../components/tooltip/_tooltip.component.theme';
 
 @mixin nb-theme-components() {
@@ -48,7 +49,6 @@
   @include nb-checkbox-theme();
   @include nb-progress-bar-theme();
   @include nb-badge-theme();
-  @include nb-popover-theme();
   @include nb-stepper-theme();
   @include nb-context-menu-theme();
   @include nb-alert-theme();
@@ -58,5 +58,7 @@
   @include nb-list-theme();
   @include nb-input-theme();
   @include nb-toaster-theme();
+  @include nb-arrowed-overlay-container-theme();
+  @include nb-overlay-theme();
   @include nb-tooltip-theme();
 }
