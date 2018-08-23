@@ -4,21 +4,23 @@
  * Licensed under the MIT License. See License.txt in the project root for license information.
  */
 
-import { Directive, ElementRef, Input } from '@angular/core';
-import { ComponentType, Overlay } from '@angular/cdk/overlay';
+import { AfterViewInit, ComponentRef, Directive, ElementRef, Input, OnDestroy } from '@angular/core';
+import { takeWhile } from 'rxjs/operators';
 
-import { NbTooltipComponent } from './tooltip.component';
 import {
+  NbAdjustableConnectedPositionStrategy,
   NbAdjustment,
-  NbOverlay,
-  NbOverlayController,
-  NbPosition,
-  NbPositionBuilderService,
-  NbPositionStrategy,
+  NbArrowedOverlayContainerComponent,
+  NbComponentPortal,
+  NbOverlayRef,
+  NbOverlayService,
+  NbPosition, NbPositionBuilderService,
+  NbToggleable,
   NbTrigger,
   NbTriggerBuilderService,
   NbTriggerStrategy,
-} from '../overlay';
+  patch,
+} from '../../cdk';
 
 /**
  *
@@ -37,7 +39,7 @@ import {
  *
  */
 @Directive({ selector: '[nbTooltip]' })
-export class NbTooltipDirective extends NbOverlayController {
+export class NbTooltipDirective implements AfterViewInit, OnDestroy, NbToggleable {
 
   context: Object = {};
 
@@ -82,42 +84,77 @@ export class NbTooltipDirective extends NbOverlayController {
   @Input('nbTooltipAdjustment')
   adjustment: NbAdjustment = NbAdjustment.CLOCKWISE;
 
-  mode: NbTrigger = NbTrigger.HINT;
+  mode: NbTrigger = NbTrigger.CLICK;
 
-  protected container: ComponentType<any> = NbTooltipComponent;
+  protected ref: NbOverlayRef;
+  protected container: ComponentRef<any>;
+  protected positionStrategy: NbAdjustableConnectedPositionStrategy;
+  protected triggerStrategy: NbTriggerStrategy;
+  protected alive: boolean = true;
 
-  protected overlay: NbOverlay;
 
   constructor(private hostRef: ElementRef,
               private triggerBuilder: NbTriggerBuilderService,
               private positionBuilder: NbPositionBuilderService,
-              cdkOverlay: Overlay) {
-    super(cdkOverlay);
+              private overlay: NbOverlayService) {
+  }
+
+  ngAfterViewInit() {
+    this.positionStrategy = this.createPositionStrategy();
+    this.ref = this.overlay.create({
+      positionStrategy: this.positionStrategy,
+      scrollStrategy: this.overlay.scrollStrategies.reposition(),
+    });
+    this.triggerStrategy = this.createTriggerStrategy();
+
+    this.subscribeOnTriggers();
+    this.subscribeOnPositionChange();
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 
   show() {
-    this.overlay.show();
+    this.container = this.ref.attach(new NbComponentPortal(NbArrowedOverlayContainerComponent));
+    patch(this.container, { position: this.position, content: this.content, context: this.context });
   }
 
   hide() {
-    this.overlay.hide();
+    this.ref.detach();
   }
 
   toggle() {
-    this.overlay.toggle();
+    if (this.ref && this.ref.hasAttached()) {
+      this.hide();
+    } else {
+      this.show();
+    }
   }
 
-  protected createPositionStrategy(): NbPositionStrategy {
+  protected createPositionStrategy(): NbAdjustableConnectedPositionStrategy {
     return this.positionBuilder
       .connectedTo(this.hostRef)
       .position(this.position)
       .adjustment(this.adjustment);
   }
 
-  protected createTriggerStrategy(overlayElement: HTMLElement): NbTriggerStrategy {
+  protected createTriggerStrategy(): NbTriggerStrategy {
     return this.triggerBuilder
       .trigger(this.mode)
       .host(this.hostRef.nativeElement)
-      .container(overlayElement);
+      .container(this.ref.overlayElement);
+  }
+
+  protected subscribeOnPositionChange() {
+    this.positionStrategy.positionChange
+      .pipe(takeWhile(() => this.alive))
+      .subscribe((position: NbPosition) => patch(this.container, { position }));
+  }
+
+  protected subscribeOnTriggers() {
+    this.triggerStrategy.show.pipe(takeWhile(() => this.alive)).subscribe(() => this.show());
+    this.triggerStrategy.hide.pipe(takeWhile(() => this.alive)).subscribe(() => this.hide());
+    this.triggerStrategy.toggle.pipe(takeWhile(() => this.alive)).subscribe(() => this.toggle());
   }
 }
